@@ -20,7 +20,8 @@
   --warn-bg:#fffbeb;--warn-text:#92400e;--warn-border:#fde68a;
   --danger-bg:#fef2f2;--danger-text:#991b1b;--danger-border:#fecaca;
   --r:8px;--r-sm:6px;--r-lg:12px;--r-xl:16px;
-  --grad1:rgba(99,102,241,.04);--grad2:rgba(16,185,129,.03);--grad3:rgba(245,158,11,.02);
+  --grad1:rgba(99,102,241,.05);--grad2:rgba(16,185,129,.04);
+  --bg-t:rgba(244,244,247,0);
 }
 [data-theme="dark"]{
   --bg:#0c0c14;--surface:#14141f;--surface2:#1c1c2a;
@@ -30,18 +31,26 @@
   --ok-bg:#0a1f12;--ok-text:#6ee7a0;--ok-border:#0f3320;
   --warn-bg:#1e1508;--warn-text:#f0c060;--warn-border:#3a2a0a;
   --danger-bg:#1e0a0a;--danger-text:#f08080;--danger-border:#3a1010;
-  --grad1:rgba(99,102,241,.05);--grad2:rgba(16,185,129,.03);--grad3:rgba(245,158,11,.02);
+  --grad1:rgba(99,102,241,.06);--grad2:rgba(16,185,129,.04);
+  --bg-t:rgba(12,12,20,0);
 }
 html,body{min-height:100vh;font-family:var(--font);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 
-/* ── Background with subtle gradient ── */
-body{
-  background:var(--bg);
-  background-image:
-    radial-gradient(ellipse 120% 80% at 0% 10%, var(--grad1), transparent 60%),
-    radial-gradient(ellipse 100% 90% at 100% 90%, var(--grad2), transparent 55%);
+/* ── Background — fixed GPU layer, no banding, no flicker ── */
+body{background:var(--bg)}
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  will-change:transform;
+  transform:translateZ(0);
+  background:
+    radial-gradient(ellipse 130% 90% at -5% 5%, var(--grad1), var(--bg-t) 55%),
+    radial-gradient(ellipse 110% 100% at 105% 95%, var(--grad2), var(--bg-t) 50%);
 }
-#wrap{min-height:100vh}
+#wrap{position:relative;z-index:1;min-height:100vh}
 
 /* ── Base elements ── */
 input,select,textarea{font-family:inherit;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 10px;outline:none;width:100%;transition:border-color .15s}
