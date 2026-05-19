@@ -35,13 +35,13 @@
 html,body{min-height:100vh;font-family:var(--font);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 
 /* ── Background with subtle gradient ── */
-body{background:var(--bg);position:relative}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:
-    radial-gradient(ellipse 60% 50% at 10% 20%, var(--grad1), transparent),
-    radial-gradient(ellipse 50% 60% at 90% 70%, var(--grad2), transparent),
-    radial-gradient(ellipse 40% 40% at 50% 90%, var(--grad3), transparent);}
-#wrap{position:relative;z-index:1;min-height:100vh}
+body{
+  background:var(--bg);
+  background-image:
+    radial-gradient(ellipse 70% 55% at 8% 18%, var(--grad1), transparent),
+    radial-gradient(ellipse 55% 65% at 92% 72%, var(--grad2), transparent);
+}
+#wrap{min-height:100vh}
 
 /* ── Base elements ── */
 input,select,textarea{font-family:inherit;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 10px;outline:none;width:100%;transition:border-color .15s}
@@ -88,9 +88,9 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
 .tab-group{display:flex;gap:1px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:2px}
 .tab{border:1px solid transparent;background:transparent;padding:4px 12px;border-radius:var(--r-sm);font-size:12px;cursor:pointer;color:var(--text3);font-family:inherit;display:inline-flex;align-items:center;gap:4px;transition:all .15s}
 .tab.on{background:var(--surface);color:var(--text);font-weight:500;border-color:var(--border)}
-.stab{border:none;background:transparent;padding:6px 14px;border-radius:var(--r-sm);font-size:13px;cursor:pointer;color:var(--text3);font-family:inherit;display:inline-flex;align-items:center;gap:4px;font-weight:500}
-.stab.on{background:var(--surface);color:var(--text);border:1px solid var(--border)}
-.stab-group{display:flex;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:3px;margin-bottom:16px}
+.stab{border:1px solid transparent;background:transparent;padding:10px 20px;border-radius:var(--r-sm);font-size:14px;cursor:pointer;color:var(--text3);font-family:inherit;display:inline-flex;align-items:center;gap:6px;font-weight:600;transition:all .15s;flex:1;justify-content:center}
+.stab.on{background:var(--surface);color:var(--text);border-color:var(--border);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.stab-group{display:flex;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:4px;margin-bottom:16px}
 .user-dot{width:26px;height:26px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text2);flex-shrink:0}
 .dark-btn{width:28px;height:28px;border-radius:var(--r-sm);border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);flex-shrink:0;padding:0}
 .dark-btn:hover{border-color:var(--border2);color:var(--text2)}
@@ -120,7 +120,7 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
 /* ── Score buttons ── */
 .sbtn{width:30px;height:28px;border-radius:var(--r-sm);font-size:12px;font-family:var(--mono);cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text3);padding:0;display:inline-flex;align-items:center;justify-content:center;transition:all .1s}
 .sbtn:hover{border-color:var(--border2);color:var(--text2)}
-.sbtn.on{background:var(--warn-bg);color:var(--warn-text);border-color:var(--warn-border);font-weight:600}
+.sbtn.on{background:var(--surface2);color:var(--text);border-color:var(--border2);font-weight:700}
 
 /* ── Filter chips ── */
 .chip{font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text3);font-family:inherit;display:inline-flex;align-items:center;gap:4px;transition:all .15s}
@@ -271,12 +271,9 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
 
     <!-- INPUTS -->
     <div id="v-inputs" class="hidden">
-      <div class="flex gap10 mb16" style="align-items:center">
-        <div class="flex1">
-          <p class="section-title">Inputs</p>
-          <p class="section-sub">Pain points e ideas del equipo. Todos pueden contribuir y puntuar.</p>
-        </div>
-        <button onclick="toggleForm()" id="add-btn" class="primary"><i class="ti ti-plus"></i>Nuevo input</button>
+      <div class="mb16">
+        <p class="section-title">Inputs</p>
+        <p class="section-sub">Pain points e ideas del equipo. Todos pueden contribuir y puntuar.</p>
       </div>
 
       <!-- Collapsible form -->
@@ -306,14 +303,17 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
         </div>
       </div>
 
-      <!-- View switcher -->
-      <div class="stab-group">
-        <button class="stab on" id="stb-list" onclick="goStab('list')"><i class="ti ti-list"></i>Lista</button>
-        <button class="stab"    id="stb-pri"  onclick="goStab('pri')"><i class="ti ti-chart-bar"></i>Priorizacion</button>
+      <!-- View switcher with + button -->
+      <div class="flex gap8 mb4" style="align-items:center">
+        <div class="stab-group" style="flex:1;margin-bottom:0">
+          <button class="stab on" id="stb-list" onclick="goStab('list')"><i class="ti ti-list"></i>Lista</button>
+          <button class="stab"    id="stb-pri"  onclick="goStab('pri')"><i class="ti ti-chart-bar"></i>Priorizacion</button>
+        </div>
+        <button onclick="toggleForm()" id="add-btn" style="height:44px;padding:0 14px"><i class="ti ti-plus"></i>Nuevo</button>
       </div>
 
       <!-- Filters + count -->
-      <div class="filter-row">
+      <div class="filter-row" style="margin-top:10px">
         <button class="chip on" id="filter-all"  onclick="setFilter('all')">Todos</button>
         <button class="chip"    id="filter-pp"   onclick="setFilter('pain_point')"><i class="ti ti-alert-circle" style="font-size:10px"></i>Pain points</button>
         <button class="chip"    id="filter-idea" onclick="setFilter('idea')"><i class="ti ti-bulb" style="font-size:10px"></i>Ideas</button>
@@ -401,6 +401,28 @@ applyDark();
 
 var DISCUSSED=JSON.parse(localStorage.getItem('sh_discussed')||'{}');
 function toggleDiscussed(id){DISCUSSED[id]=!DISCUSSED[id];localStorage.setItem('sh_discussed',JSON.stringify(DISCUSSED));rInputList();}
+
+var ACTION_ORDER=JSON.parse(localStorage.getItem('sh_act_order')||'{}');
+function getOrderedActions(bucketId){
+  var acts=ACTIONS.filter(function(a){return a.bucketId===bucketId;});
+  var order=ACTION_ORDER[bucketId];
+  if(!order||!order.length)return acts;
+  return acts.slice().sort(function(a,b){
+    var ia=order.indexOf(a.id),ib=order.indexOf(b.id);
+    if(ia<0)ia=999;if(ib<0)ib=999;return ia-ib;
+  });
+}
+function moveAction(bucketId,actionId,dir){
+  var acts=getOrderedActions(bucketId);
+  var order=acts.map(function(a){return a.id;});
+  var idx=order.indexOf(actionId);
+  var newIdx=idx+dir;
+  if(newIdx<0||newIdx>=order.length)return;
+  var tmp=order[idx];order[idx]=order[newIdx];order[newIdx]=tmp;
+  ACTION_ORDER[bucketId]=order;
+  localStorage.setItem('sh_act_order',JSON.stringify(ACTION_ORDER));
+  rAcciones();
+}
 
 function gh(body){var h={'apikey':SKEY};if(SKEY.startsWith('eyJ'))h['Authorization']='Bearer '+SKEY;if(body){h['Content-Type']='application/json';h['Prefer']='return=minimal';}return h;}
 var api={
@@ -590,6 +612,10 @@ function saveAction(bucketId){
   document.querySelectorAll('.ai-check-'+bucketId+':checked').forEach(function(c){selInputs.push(c.value);});
   var act={id:uid(),bucketId:bucketId,title:t,description:desc,expectedValue:ev,createdAt:new Date().toISOString()};
   ACTIONS.push(act);
+  // Add to end of order
+  if(!ACTION_ORDER[bucketId])ACTION_ORDER[bucketId]=[];
+  ACTION_ORDER[bucketId].push(act.id);
+  localStorage.setItem('sh_act_order',JSON.stringify(ACTION_ORDER));
   selInputs.forEach(function(inputId){var ai={id:uid(),action_id:act.id,input_id:inputId};AINPUTS.push(ai);api.post('action_inputs',ai).catch(function(e){console.error(e);});});
   document.getElementById('aft-'+bucketId).value='';
   document.getElementById('afd-'+bucketId).value='';
@@ -706,21 +732,23 @@ function rInputPri(){
   if(!fl.length){el.innerHTML='<div class="card" style="padding:2rem;text-align:center"><p class="muted">Sin inputs para puntuar.</p></div>';return;}
   el.innerHTML=fl.map(function(inp,i){
     var a=agg(inp),my=inp.scores[user]||{};
-    var sc=a.n?(a.total>=4?'var(--ok-text)':a.total>=2.5?'var(--warn-text)':'var(--text2)'):'var(--text3)';
     var isPP=inp.type==='pain_point';
-    return'<div class="card mb8" style="padding:1rem;border-left:3px solid '+(isPP?'#E24B4A':'#22c55e')+'">'+
+    var barColor=isPP?'#E24B4A':'#22c55e';
+    // Border intensity based on score: low score = thin faint, high score = brighter
+    var scoreRatio=a.n?a.total/5:0;
+    var borderOpacity=a.n?(0.3+scoreRatio*0.7):0.15;
+    return'<div class="card mb8" style="padding:1rem;border-left:3px solid '+barColor+';opacity:'+(a.n?1:0.7)+'">'+
       '<div class="flex gap12" style="align-items:flex-start">'+
-        '<div class="tc" style="min-width:48px;padding-top:2px">'+
-          '<div style="font-size:24px;font-weight:700;font-family:var(--mono);color:'+sc+';line-height:1">'+a.ts+'</div>'+
-          '<div class="muted mt4">#'+(i+1)+'</div>'+
-        '</div>'+
         '<div class="flex1">'+
-          '<div class="flex gap6 mb4 wrap" style="align-items:center">'+
-            '<span style="font-size:14px;font-weight:600">'+inp.title+'</span>'+
-            '<span class="ntag">'+inp.area+'</span>'+
+          '<div class="flex gap8 mb6" style="align-items:center">'+
+            '<span style="font-size:14px;font-weight:600;flex:1;line-height:1.3">'+inp.title+'</span>'+
+            '<div style="text-align:right;flex-shrink:0">'+
+              '<div style="font-size:22px;font-weight:700;font-family:var(--mono);color:var(--text3);line-height:1">#'+(i+1)+'</div>'+
+              (a.n?'<div style="font-size:10px;color:var(--text3);text-align:right;margin-top:2px">'+a.ts+' avg</div>':'<div style="font-size:10px;color:var(--text3);margin-top:2px">sin votos</div>')+
+            '</div>'+
           '</div>'+
-          '<p class="muted mb8">'+(a.n?a.n+' valoracion'+(a.n!==1?'es':'')+' - I:'+a.impact+' U:'+a.urgency:'Sin valoraciones')+'</p>'+
-          '<div class="flex gap12 wrap">'+
+          '<p class="muted mb8">'+(a.n?a.n+' valoracion'+(a.n!==1?'es':'')+' - I:'+a.impact+' U:'+a.urgency:'Aun sin valoraciones')+'</p>'+
+          '<div class="flex gap16 wrap">'+
             ['impact','urgency'].map(function(f){
               return'<div><span class="lbl">'+(f==='impact'?'Impacto':'Urgencia')+'</span>'+
                 '<div class="flex gap4">'+[1,2,3,4,5].map(function(n){
@@ -744,7 +772,7 @@ function rAcciones(){
   var unassigned=INPUTS.filter(function(inp){return assignedIds.indexOf(inp.id)<0;});
   el.innerHTML=BUCKETS.map(function(bucket){
     var bInputs=BINPUTS.filter(function(b){return b.bucket_id===bucket.id;}).sort(function(a,b){return a.position-b.position;});
-    var bActions=ACTIONS.filter(function(a){return a.bucketId===bucket.id;});
+    var bActions=getOrderedActions(bucket.id);
     var isOpen=openBuckets[bucket.id]!==false;
     var inputsHtml=bInputs.map(function(bi,idx){
       var inp=INPUTS.find(function(p){return p.id===bi.input_id;});if(!inp)return'';
@@ -758,13 +786,16 @@ function rAcciones(){
         '</div>':'')+
       '</div>';
     }).join('');
-    var actionsHtml=bActions.map(function(act){
+    var actionsHtml=bActions.map(function(act,aidx){
       var actInputs=AINPUTS.filter(function(ai){return ai.action_id===act.id;}).map(function(ai){return INPUTS.find(function(p){return p.id===ai.input_id;});}).filter(Boolean);
       var inRM=!!ROADMAP.find(function(r){return r.actionId===act.id;});
       return'<div class="action-card">'+
         '<div class="flex gap8 mb6" style="align-items:flex-start">'+
+          '<span style="font-size:11px;font-weight:700;font-family:var(--mono);color:var(--text3);min-width:20px;padding-top:2px">'+(aidx+1)+'.</span>'+
           '<div class="flex1"><p style="font-size:13px;font-weight:600;margin-bottom:2px">'+act.title+'</p>'+(act.description?'<p style="font-size:12px;color:var(--text2)">'+act.description+'</p>':'')+'</div>'+
           (admin?'<div class="flex gap4">'+
+            (bActions.length>1?'<button onclick="moveAction(\''+bucket.id+'\',\''+act.id+'\',-1)" class="ghost icon-btn" style="font-size:11px"'+(aidx===0?' disabled':'')+'>↑</button>'+
+            '<button onclick="moveAction(\''+bucket.id+'\',\''+act.id+'\',1)" class="ghost icon-btn" style="font-size:11px"'+(aidx===bActions.length-1?' disabled':'')+'>↓</button>':'')+
             '<button onclick="'+(inRM?'':'toRoadmap(\''+act.id+'\')')+'" style="font-size:11px;'+(inRM?'color:var(--ok-text);border-color:var(--ok-border);cursor:default':'')+'">'+
             (inRM?'<i class="ti ti-check"></i> En roadmap':'Roadmap')+'</button>'+
             '<button onclick="delAction(\''+act.id+'\')" class="ghost icon-btn"><i class="ti ti-trash"></i></button>'+
