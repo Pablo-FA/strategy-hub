@@ -275,6 +275,7 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
           </div>
         </div>
       </div>
+      <div id="home-log-panel" class="home-info hidden" style="margin-top:0"></div>
     </div>
 
     <!-- INPUTS -->
@@ -444,6 +445,8 @@ var user='',admin=false,tab='home',stab='list',inputFilter='all',inputType='pain
 var INPUTS=[],BUCKETS=[],BINPUTS=[],ACTIONS=[],AINPUTS=[],ADEPS=[],ROADMAP=[],TAX={internal:[],external:[]};
 var openBuckets={},showOrigin={},logCursor={};
 
+var ULOGS=[];
+
 function inpFrom(r){return{id:r.id,title:r.title,description:r.description||'',type:r.type||'pain_point',area:r.area||'',isUrgent:r.is_urgent,impactScope:r.impact_scope||'',impactDetail:r.impact_detail||'',author:r.author,createdAt:r.created_at,scores:r.scores||{}};}
 function inpTo(p){return{id:p.id,title:p.title,description:p.description,type:p.type,area:p.area,is_urgent:p.isUrgent,impact_scope:p.impactScope,impact_detail:p.impactDetail,author:p.author,scores:p.scores};}
 function actFrom(r){return{id:r.id,bucketId:r.bucket_id,title:r.title,description:r.description||'',expectedValue:r.expected_value||'',createdAt:r.created_at};}
@@ -459,14 +462,21 @@ function loadAll(){
     api.get('action_inputs'),
     api.get('action_deps'),
     api.get('roadmap_items','order=created_at.asc'),
-    api.get('taxonomy_items','order=position.asc')
+    api.get('taxonomy_items','order=position.asc'),
+    api.get('user_log','order=created_at.desc&limit=50')
   ]).then(function(res){
     INPUTS=res[0].map(inpFrom);BUCKETS=res[1];BINPUTS=res[2];
     ACTIONS=res[3].map(actFrom);AINPUTS=res[4];ADEPS=res[5];
     ROADMAP=res[6].map(rmFrom);
     TAX={internal:[],external:[]};
     res[7].forEach(function(r){if(TAX[r.scope])TAX[r.scope].push({id:r.id,value:r.value});});
+    ULOGS=res[8];
   });
+}
+
+function logAccess(name){
+  var entry={id:uid(),name:name,created_at:new Date().toISOString(),user_agent:navigator.userAgent.slice(0,120)};
+  api.post('user_log',entry).catch(function(e){console.error(e);});
 }
 
 function login(){
@@ -477,6 +487,7 @@ function login(){
   document.getElementById('li-conn-err').classList.add('hidden');
   loadAll().then(function(){
     localStorage.setItem('sh_user',n);
+    logAccess(n);
     startApp(n);
   }).catch(function(e){
     document.getElementById('li-loading').classList.add('hidden');
@@ -693,9 +704,36 @@ function rHome(){
   var ic=document.getElementById('home-inp-count');
   var ac=document.getElementById('home-act-count');
   var rc=document.getElementById('home-rm-count');
-  if(ic)ic.textContent=INPUTS.length+' input'+(INPUTS.length!==1?'s'+'  registrado'+(INPUTS.length!==1?'s':''):'  registrado');
-  if(ac)ac.textContent=ACTIONS.length+' accion'+(ACTIONS.length!==1?'es':'')+' definida'+(ACTIONS.length!==1?'s':'');
-  if(rc)rc.textContent=ROADMAP.length+' iniciativa'+(ROADMAP.length!==1?'s':'')+' en roadmap';
+  if(ic)ic.textContent=INPUTS.length+' input'+(INPUTS.length!==1?'s registrados':' registrado');
+  if(ac)ac.textContent=ACTIONS.length+' accion'+(ACTIONS.length!==1?'es definidas':' definida');
+  if(rc)rc.textContent=ROADMAP.length+' iniciativa'+(ROADMAP.length!==1?'s en roadmap':' en roadmap');
+
+  var logPanel=document.getElementById('home-log-panel');
+  if(!logPanel)return;
+  if(!admin){logPanel.classList.add('hidden');return;}
+  logPanel.classList.remove('hidden');
+
+  // Group by name, count accesses
+  var counts={};
+  ULOGS.forEach(function(l){counts[l.name]=(counts[l.name]||0)+1;});
+
+  logPanel.innerHTML='<p style="font-size:13px;font-weight:600;margin-bottom:12px">Registro de accesos <span class="muted" style="font-size:11px;font-weight:400">ultimos 50</span></p>'+
+    '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">'+
+    '<thead><tr style="border-bottom:1px solid var(--border)">'+
+    '<th style="text-align:left;padding:6px 10px;color:var(--text3);font-weight:500">Nombre</th>'+
+    '<th style="text-align:left;padding:6px 10px;color:var(--text3);font-weight:500">Fecha y hora</th>'+
+    '<th style="text-align:right;padding:6px 10px;color:var(--text3);font-weight:500">Accesos totales</th>'+
+    '</tr></thead><tbody>'+
+    ULOGS.map(function(l){
+      var d=new Date(l.created_at);
+      var dateStr=d.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+      return'<tr style="border-bottom:1px solid var(--border)">'+
+        '<td style="padding:7px 10px;font-weight:500">'+l.name+'</td>'+
+        '<td style="padding:7px 10px;color:var(--text2)">'+dateStr+'</td>'+
+        '<td style="padding:7px 10px;text-align:right;color:var(--text3)">'+counts[l.name]+'</td>'+
+      '</tr>';
+    }).join('')+
+    '</tbody></table></div>';
 }
 
 function rInputs(){
