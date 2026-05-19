@@ -22,6 +22,7 @@
   --r:8px;--r-sm:6px;--r-lg:12px;--r-xl:16px;
   --grad1:rgba(99,102,241,.05);--grad2:rgba(16,185,129,.04);
   --bg-t:rgba(244,244,247,0);
+  --glow1:rgba(99,102,241,.05);--glow2:rgba(16,185,129,.04);
 }
 [data-theme="dark"]{
   --bg:#0c0c14;--surface:#14141f;--surface2:#1c1c2a;
@@ -33,6 +34,7 @@
   --danger-bg:#1e0a0a;--danger-text:#f08080;--danger-border:#3a1010;
   --grad1:rgba(99,102,241,.06);--grad2:rgba(16,185,129,.04);
   --bg-t:rgba(12,12,20,0);
+  --glow1:rgba(99,102,241,.07);--glow2:rgba(16,185,129,.05);
 }
 html,body{min-height:100vh;font-family:var(--font);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 
@@ -46,9 +48,10 @@ body::before{
   z-index:0;
   will-change:transform;
   transform:translateZ(0);
-  background:
-    radial-gradient(ellipse 130% 90% at -5% 5%, var(--grad1), var(--bg-t) 55%),
-    radial-gradient(ellipse 110% 100% at 105% 95%, var(--grad2), var(--bg-t) 50%);
+  backface-visibility:hidden;
+  box-shadow:
+    inset 350px 350px 600px var(--glow1),
+    inset -350px -350px 600px var(--glow2);
 }
 #wrap{position:relative;z-index:1;min-height:100vh}
 
@@ -745,27 +748,21 @@ function rInputPri(){
     var barColor=isPP?'#E24B4A':'#22c55e';
     var iRnd=a.n?Math.round(parseFloat(a.impact)):'-';
     var uRnd=a.n?Math.round(parseFloat(a.urgency)):'-';
-    return'<div class="card mb8" style="padding:1rem;border-left:3px solid '+barColor+';opacity:'+(a.n?1:0.7)+'">'+
-      '<div class="flex gap8" style="align-items:flex-start">'+
-        '<div class="flex1">'+
-          '<div class="flex" style="align-items:flex-start;justify-content:space-between;gap:12px">'+
-            '<span style="font-size:14px;font-weight:600;line-height:1.3;padding-top:2px">'+inp.title+'</span>'+
-            '<div style="text-align:right;flex-shrink:0">'+
-              '<div style="font-size:45px;font-weight:700;font-family:var(--mono);color:var(--text3);line-height:1">#'+(i+1)+'</div>'+
-              (a.n?'<div style="font-size:10px;color:var(--text3);text-align:right;margin-top:3px">'+a.ts+' avg</div>':'<div style="font-size:10px;color:var(--text3);margin-top:3px">sin votos</div>')+
-            '</div>'+
-          '</div>'+
-          '<div class="flex gap16 wrap" style="margin-top:6px">'+
-            ['impact','urgency'].map(function(f){
-              return'<div><span class="lbl">'+(f==='impact'?'Impacto':'Urgencia')+'</span>'+
-                '<div class="flex gap4">'+[1,2,3,4,5].map(function(n){
-                  return'<button class="sbtn'+(my[f]===n?' on':'')+'" onclick="setScore(\''+inp.id+'\',\''+f+'\','+n+')">'+n+'</button>';
-                }).join('')+'</div></div>';
-            }).join('')+
-          '</div>'+
-          '<p class="muted" style="margin-top:10px">'+(a.n?a.n+' valoracion'+(a.n!==1?'es':'')+' - I:'+iRnd+' U:'+uRnd:'Aun sin valoraciones')+'</p>'+
+    return'<div class="card mb8" style="padding:.875rem 1rem;border-left:3px solid '+barColor+';opacity:'+(a.n?1:0.7)+'">'+
+      '<span style="font-size:14px;font-weight:600;line-height:1.3;display:block;margin-bottom:10px">'+inp.title+'</span>'+
+      '<div class="flex gap16 wrap" style="align-items:flex-end">'+
+        ['impact','urgency'].map(function(f){
+          return'<div><span class="lbl">'+(f==='impact'?'Impacto':'Urgencia')+'</span>'+
+            '<div class="flex gap4">'+[1,2,3,4,5].map(function(n){
+              return'<button class="sbtn'+(my[f]===n?' on':'')+'" onclick="setScore(\''+inp.id+'\',\''+f+'\','+n+')">'+n+'</button>';
+            }).join('')+'</div></div>';
+        }).join('')+
+        '<div style="margin-left:auto;text-align:right">'+
+          '<div style="font-size:45px;font-weight:700;font-family:var(--mono);color:var(--text3);line-height:1">#'+(i+1)+'</div>'+
+          (a.n?'<div style="font-size:10px;color:var(--text3);margin-top:2px">'+a.ts+' avg</div>':'<div style="font-size:10px;color:var(--text3);margin-top:2px">sin votos</div>')+
         '</div>'+
       '</div>'+
+      '<p class="muted" style="margin-top:8px">'+(a.n?a.n+' valoracion'+(a.n!==1?'es':'')+' - I:'+iRnd+' U:'+uRnd:'Aun sin valoraciones')+'</p>'+
     '</div>';
   }).join('');
 }
