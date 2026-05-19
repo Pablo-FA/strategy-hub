@@ -20,7 +20,7 @@
   --warn-bg:#fffbeb;--warn-text:#92400e;--warn-border:#fde68a;
   --danger-bg:#fef2f2;--danger-text:#991b1b;--danger-border:#fecaca;
   --r:8px;--r-sm:6px;--r-lg:12px;--r-xl:16px;
-  --grad1:rgba(99,102,241,.06);--grad2:rgba(16,185,129,.04);--grad3:rgba(245,158,11,.03);
+  --grad1:rgba(99,102,241,.04);--grad2:rgba(16,185,129,.03);--grad3:rgba(245,158,11,.02);
 }
 [data-theme="dark"]{
   --bg:#0c0c14;--surface:#14141f;--surface2:#1c1c2a;
@@ -30,7 +30,7 @@
   --ok-bg:#0a1f12;--ok-text:#6ee7a0;--ok-border:#0f3320;
   --warn-bg:#1e1508;--warn-text:#f0c060;--warn-border:#3a2a0a;
   --danger-bg:#1e0a0a;--danger-text:#f08080;--danger-border:#3a1010;
-  --grad1:rgba(99,102,241,.08);--grad2:rgba(16,185,129,.05);--grad3:rgba(245,158,11,.04);
+  --grad1:rgba(99,102,241,.05);--grad2:rgba(16,185,129,.03);--grad3:rgba(245,158,11,.02);
 }
 html,body{min-height:100vh;font-family:var(--font);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 
@@ -38,8 +38,8 @@ html,body{min-height:100vh;font-family:var(--font);color:var(--text);font-size:1
 body{
   background:var(--bg);
   background-image:
-    radial-gradient(ellipse 70% 55% at 8% 18%, var(--grad1), transparent),
-    radial-gradient(ellipse 55% 65% at 92% 72%, var(--grad2), transparent);
+    radial-gradient(ellipse 120% 80% at 0% 10%, var(--grad1), transparent 60%),
+    radial-gradient(ellipse 100% 90% at 100% 90%, var(--grad2), transparent 55%);
 }
 #wrap{min-height:100vh}
 
@@ -743,7 +743,7 @@ function rInputPri(){
           '<div class="flex gap8 mb6" style="align-items:center">'+
             '<span style="font-size:14px;font-weight:600;flex:1;line-height:1.3">'+inp.title+'</span>'+
             '<div style="text-align:right;flex-shrink:0">'+
-              '<div style="font-size:22px;font-weight:700;font-family:var(--mono);color:var(--text3);line-height:1">#'+(i+1)+'</div>'+
+              '<div style="font-size:32px;font-weight:700;font-family:var(--mono);color:var(--text3);line-height:1">#'+(i+1)+'</div>'+
               (a.n?'<div style="font-size:10px;color:var(--text3);text-align:right;margin-top:2px">'+a.ts+' avg</div>':'<div style="font-size:10px;color:var(--text3);margin-top:2px">sin votos</div>')+
             '</div>'+
           '</div>'+
