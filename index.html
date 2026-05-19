@@ -22,7 +22,9 @@
   --r:8px;--r-sm:6px;--r-lg:12px;--r-xl:16px;
   --grad1:rgba(99,102,241,.05);--grad2:rgba(16,185,129,.04);
   --bg-t:rgba(244,244,247,0);
-  --glow1:rgba(99,102,241,.05);--glow2:rgba(16,185,129,.04);
+  --glow1:rgba(99,102,241,.18);--glow2:rgba(16,185,129,.14);
+  --glow-opacity:.07;
+  --glow-c1:rgb(99,102,241);--glow-c2:rgb(16,185,129);
 }
 [data-theme="dark"]{
   --bg:#0c0c14;--surface:#14141f;--surface2:#1c1c2a;
@@ -34,25 +36,18 @@
   --danger-bg:#1e0a0a;--danger-text:#f08080;--danger-border:#3a1010;
   --grad1:rgba(99,102,241,.06);--grad2:rgba(16,185,129,.04);
   --bg-t:rgba(12,12,20,0);
-  --glow1:rgba(99,102,241,.07);--glow2:rgba(16,185,129,.05);
+  --glow1:rgba(99,102,241,.22);--glow2:rgba(16,185,129,.16);
+  --glow-opacity:.16;
+  --glow-c1:rgb(99,102,241);--glow-c2:rgb(16,185,129);
 }
 html,body{min-height:100vh;font-family:var(--font);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 
 /* ── Background — fixed GPU layer, no banding, no flicker ── */
 body{background:var(--bg)}
-body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:0;
-  will-change:transform;
-  transform:translateZ(0);
-  backface-visibility:hidden;
-  box-shadow:
-    inset 350px 350px 600px var(--glow1),
-    inset -350px -350px 600px var(--glow2);
-}
+.bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg-glow::before,.bg-glow::after{content:'';position:absolute;border-radius:50%;width:600px;height:600px;filter:blur(100px);opacity:var(--glow-opacity);will-change:transform}
+.bg-glow::before{background:var(--glow-c1);top:-200px;left:-200px}
+.bg-glow::after{background:var(--glow-c2);bottom:-200px;right:-200px}
 #wrap{position:relative;z-index:1;min-height:100vh}
 
 /* ── Base elements ── */
@@ -172,6 +167,7 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
 </head>
 <body>
 <div id="wrap">
+<div class="bg-glow" aria-hidden="true"></div>
 
 <!-- CONFIG -->
 <div id="v-config" class="page-center hidden">
