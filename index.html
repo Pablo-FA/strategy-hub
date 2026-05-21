@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Executive Hub</title>
+<title>Strategy Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
@@ -75,6 +75,20 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
 .gap4{gap:4px}.gap6{gap:6px}.gap8{gap:8px}.gap10{gap:10px}.gap12{gap:12px}.gap16{gap:16px}.wrap{flex-wrap:wrap}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.cal-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.cal-nav{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.cal-grid-head{display:grid;grid-template-columns:repeat(7,1fr);background:var(--surface2);border-bottom:1px solid var(--border)}
+.cal-dname{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);text-align:center;padding:7px 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-cell{min-height:88px;padding:5px;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.cal-cell:nth-child(7n){border-right:none}
+.cal-num{font-size:11px;font-weight:500;color:var(--text3);width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%;margin-bottom:4px}
+.cal-num.today{background:var(--info-text);color:#fff;font-weight:700}
+.cal-ev{font-size:10px;padding:2px 5px;border-radius:3px;margin-bottom:2px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.6;display:block;transition:opacity .1s}
+.cal-ev:hover{opacity:.75}
+.rm-modal-overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:1rem}
+.rm-modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);width:540px;max-width:100%;max-height:88vh;overflow-y:auto}
 .tc{text-align:center}
 .mb4{margin-bottom:4px}.mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb10{margin-bottom:10px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
 .mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}
@@ -173,7 +187,7 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
 <div id="v-config" class="page-center hidden">
   <div class="card" style="width:420px;padding:2.5rem">
     <div class="logo" style="width:40px;height:40px;border-radius:10px;margin-bottom:16px"><i class="ti ti-chart-arrows-vertical" style="font-size:18px;color:var(--text2)"></i></div>
-    <p style="font-size:17px;font-weight:600;margin-bottom:4px">Executive Hub</p>
+    <p style="font-size:17px;font-weight:600;margin-bottom:4px">Strategy Hub</p>
     <p class="muted mb12" style="margin-bottom:1.5rem">Configura la conexion a Supabase. Solo necesitas hacerlo una vez.</p>
     <div class="flex-col gap10">
       <div><span class="lbl">Supabase Project URL</span><input type="text" id="cfg-url" placeholder="https://xxxx.supabase.co" autocomplete="off" /></div>
@@ -188,7 +202,7 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
 <div id="v-login" class="page-center hidden">
   <div class="card" style="width:320px;padding:2.5rem;text-align:center">
     <div class="logo" style="width:40px;height:40px;border-radius:10px;margin:0 auto 16px"><i class="ti ti-chart-arrows-vertical" style="font-size:18px;color:var(--text2)"></i></div>
-    <p style="font-size:17px;font-weight:600;margin-bottom:4px">Executive Hub</p>
+    <p style="font-size:17px;font-weight:600;margin-bottom:4px">Strategy Hub</p>
     <p class="muted" style="margin-bottom:1.75rem">Comite ejecutivo</p>
     <input type="text" id="li-name" placeholder="Tu nombre" autocomplete="off" style="margin-bottom:10px" />
     <button class="primary" id="li-btn" style="width:100%;justify-content:center">Entrar</button>
@@ -203,7 +217,7 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
 <div id="v-app" class="hidden">
   <div id="header">
     <div class="logo"><i class="ti ti-chart-arrows-vertical" style="font-size:13px;color:var(--text2)"></i></div>
-    <span style="font-size:13px;font-weight:600;flex:1">Executive Hub</span>
+    <span style="font-size:13px;font-weight:600;flex:1">Strategy Hub</span>
     <div class="tab-group">
       <button class="tab on" id="tb-home"     onclick="goTab('home')"><i class="ti ti-home"></i>Inicio</button>
       <button class="tab"    id="tb-inputs"   onclick="goTab('inputs')"><i class="ti ti-inbox"></i>Inputs</button>
@@ -222,7 +236,7 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
     <!-- HOME -->
     <div id="v-home">
       <div class="home-hero">
-        <p style="font-size:22px;font-weight:700;margin-bottom:6px">Bienvenido al executive Hub</p>
+        <p style="font-size:22px;font-weight:700;margin-bottom:6px">Bienvenido al Strategy Hub</p>
         <p class="section-sub" style="font-size:13px">Herramienta de gestion estrategica del comite ejecutivo. Captura, prioriza y convierte los puntos de dolor del equipo en acciones con impacto real.</p>
       </div>
       <div class="home-grid">
@@ -261,17 +275,17 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
           <div style="border-top:1px solid var(--border)"></div>
           <div class="flex gap10" style="align-items:flex-start">
             <span style="font-size:11px;font-weight:600;color:var(--text3);min-width:60px;padding-top:1px">REUNION</span>
-            <p style="font-size:12px;color:var(--text2);line-height:1.5">En la reunion semanal se revisan los inputs en Priorizacion, se puntuan colectivamente y se marca como Discutido lo que ya ha sido tratado. Se comparte pantalla.</p>
+            <p style="font-size:12px;color:var(--text2);line-height:1.5">En la reunion semanal se revisan los inputs en Priorizacion, se puntuan colectivamente y se marca como Discutido lo que ya ha sido tratado. El Strategy Lead comparte pantalla.</p>
           </div>
           <div style="border-top:1px solid var(--border)"></div>
           <div class="flex gap10" style="align-items:flex-start">
             <span style="font-size:11px;font-weight:600;color:var(--text3);min-width:60px;padding-top:1px">ACCION</span>
-            <p style="font-size:12px;color:var(--text2);line-height:1.5">Se agrupan inputs en buckets, define las acciones concretas y las mapea en el roadmap con owner y deadline. Se revisa el avance en cada reunion.</p>
+            <p style="font-size:12px;color:var(--text2);line-height:1.5">El Strategy Lead agrupa inputs en buckets, define las acciones concretas y las mapea en el roadmap con owner y deadline. Se revisa el avance en cada reunion.</p>
           </div>
           <div style="border-top:1px solid var(--border)"></div>
           <div class="flex gap10" style="align-items:flex-start">
             <span style="font-size:11px;font-weight:600;color:var(--text3);min-width:60px;padding-top:1px">ROLES</span>
-            <p style="font-size:12px;color:var(--text2);line-height:1.5">Todos los miembros del comite pueden capturar inputs y puntuar. </p>
+            <p style="font-size:12px;color:var(--text2);line-height:1.5">Todos los miembros del comite pueden capturar inputs y puntuar. Solo el Strategy Lead accede al Roadmap y a la gestion de Acciones mediante contrasena.</p>
           </div>
         </div>
       </div>
@@ -363,24 +377,35 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
         <div class="card" style="width:300px;padding:2.5rem;text-align:center">
           <i class="ti ti-lock" style="font-size:28px;color:var(--text3);margin-bottom:14px"></i>
           <p style="font-size:15px;font-weight:500;margin-bottom:4px">Acceso restringido</p>
-          <p class="muted" style="margin-bottom:1.5rem">Vista exclusiva.</p>
+          <p class="muted" style="margin-bottom:1.5rem">Vista exclusiva del Strategy Lead.</p>
           <input type="password" id="pin-in" autocomplete="new-password" placeholder="Contrasena" style="margin-bottom:8px;text-align:center" />
           <p id="pin-err" class="hidden" style="font-size:12px;color:var(--danger-text);margin-bottom:8px">Contrasena incorrecta</p>
           <button class="primary" onclick="chkPin()" style="width:100%;justify-content:center">Entrar</button>
         </div>
       </div>
       <div id="rm-main" class="hidden">
-        <div class="flex gap8 mb16 wrap">
-          <div class="flex1"><p class="section-title">Roadmap estrategico</p><p class="section-sub">Ordena acciones en el tiempo. Pulsa Origen para ver la trazabilidad if/then.</p></div>
+        <div class="flex gap8 mb12 wrap">
+          <div class="flex1"><p class="section-title">Roadmap estrategico</p><p class="section-sub">Tablero cronologico y calendario de deadlines.</p></div>
           <span class="ntag" style="background:var(--ok-bg);color:var(--ok-text);border-color:var(--ok-border)"><i class="ti ti-shield-check" style="font-size:10px;vertical-align:-1px"></i> Strategy Lead</span>
         </div>
-        <div id="rm-board" class="g3"></div>
+        <div id="rm-owner-bar" class="filter-row mb12"></div>
+        <div class="flex gap4 mb12">
+          <button class="stab on" id="rtb-board" onclick="goRT('board')"><i class="ti ti-layout-columns"></i>Tablero</button>
+          <button class="stab"    id="rtb-cal"   onclick="goRT('cal')"><i class="ti ti-calendar"></i>Calendario</button>
+        </div>
+        <div id="rm-board-view"><div id="rm-board"></div></div>
+        <div id="rm-cal-view" class="hidden"><div id="rm-calendar"></div></div>
       </div>
     </div>
 
   </div>
 </div>
 
+<!-- RM Detail Modal -->
+<div id="rm-modal" class="rm-modal-overlay hidden" onclick="closeRMModal(event)">
+  <div class="rm-modal" onclick="event.stopPropagation()">
+    <div id="rm-modal-content"></div>
+  </div>
 </div>
 <script>
 var SURL='',SKEY='';
@@ -901,97 +926,182 @@ var HZNS=[{k:'corto',l:'Corto plazo',s:'0-6m',col:'#EF9F27'},{k:'medio',l:'Medio
 var STATS=['Sin iniciar','En analisis','En progreso','Bloqueado','Completado'];
 var SCOL={'Sin iniciar':'#888','En analisis':'#378ADD','En progreso':'#EF9F27','Bloqueado':'#E24B4A','Completado':'#639922'};
 
-function rRM(){if(!admin)return;rBoard();}
+var ownerFilter='all',rmTab='board';
+var calMonth=new Date().getMonth(),calYear=new Date().getFullYear();
+var MNAMES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var DNAMES=['Lun','Mar','Mie','Jue','Vie','Sab','Dom'];
+
+function goRT(t){
+  rmTab=t;
+  document.getElementById('rm-board-view').classList.toggle('hidden',t!=='board');
+  document.getElementById('rm-cal-view').classList.toggle('hidden',t!=='cal');
+  document.getElementById('rtb-board').classList.toggle('on',t==='board');
+  document.getElementById('rtb-cal').classList.toggle('on',t==='cal');
+  if(t==='board')rBoard();else rCalendar();
+}
+function setOwnerFilter(o){
+  ownerFilter=o;rOwnerBar();
+  if(rmTab==='board')rBoard();else rCalendar();
+}
+function rOwnerBar(){
+  var owners=[],seen={};
+  ROADMAP.forEach(function(r){if(r.owner&&!seen[r.owner]){seen[r.owner]=1;owners.push(r.owner);}});
+  var el=document.getElementById('rm-owner-bar');if(!el)return;
+  el.innerHTML='<button class="chip'+(ownerFilter==='all'?' on':'')+'" onclick="setOwnerFilter(\'all\')">Todos</button>'+
+    owners.map(function(o){return'<button class="chip'+(ownerFilter===o?' on':'')+'" onclick="setOwnerFilter(\''+o+'\')">'+o+'</button>';}).join('');
+}
+function rRM(){if(!admin)return;rOwnerBar();goRT(rmTab);}
+
 function rBoard(){
   if(!admin)return;
-  document.getElementById('rm-board').innerHTML=HZNS.map(function(h){
-    var its=ROADMAP.filter(function(r){return r.horizon===h.k;});
-    return'<div><div class="h-col-wrap">'+
-      '<div class="h-col-head" style="border-top:3px solid '+h.col+'">'+
-        '<span class="h-dot" style="background:'+h.col+'"></span>'+
-        '<span style="font-size:13px;font-weight:600">'+h.l+'</span>'+
-        '<span class="muted" style="margin-left:auto;font-size:11px">'+h.s+'</span>'+
-        '<span class="ntag" style="margin-left:8px;font-size:11px">'+its.length+'</span>'+
+  var items=ownerFilter==='all'?ROADMAP:ROADMAP.filter(function(r){return r.owner===ownerFilter;});
+  var backlog=items.filter(function(r){return!r.deadline||!r.owner;});
+  var scheduled=items.filter(function(r){return r.deadline&&r.owner;});
+  scheduled.sort(function(a,b){return new Date(a.deadline)-new Date(b.deadline);});
+  var cols=HZNS.map(function(h){
+    return renderCol(h.l,h.s,h.col,scheduled.filter(function(r){return r.horizon===h.k;}),false);
+  });
+  cols.push(renderCol('Backlog','Sin fecha / Sin asignar','#6b7280',backlog,true));
+  var bd=document.getElementById('rm-board');
+  bd.className='g4';bd.innerHTML=cols.join('');
+}
+
+function renderCol(label,sub,col,its,isBacklog){
+  return'<div><div class="h-col-wrap" style="'+(isBacklog?'border-style:dashed;border-color:var(--border2)':'')+'">'+
+    '<div class="h-col-head" style="border-top:3px solid '+col+'">'+
+      '<span class="h-dot" style="background:'+col+'"></span>'+
+      '<span style="font-size:13px;font-weight:600">'+label+'</span>'+
+      '<span class="muted" style="margin-left:auto;font-size:11px">'+sub+'</span>'+
+      '<span class="ntag" style="margin-left:8px;font-size:11px">'+its.length+'</span>'+
+    '</div>'+
+    '<div class="h-col-body">'+
+    its.map(function(rm){return rmCardHtml(rm);}).join('')+
+    (its.length===0?'<div style="border:1px dashed var(--border);border-radius:var(--r);padding:1.25rem;text-align:center"><p class="muted">'+(isBacklog?'Sin items en backlog':'Sin acciones')+'</p></div>':'')+
+    '</div></div></div>';
+}
+
+function rmCardHtml(rm){
+  var dl=dlInfo(rm.deadline),log=rm.log||[],cur=logCursor[rm.id]||0;
+  var entry=log.length?log[log.length-1-cur]:null;
+  var act=ACTIONS.find(function(a){return a.id===rm.actionId;});
+  var actInputs=act?AINPUTS.filter(function(ai){return ai.action_id===act.id;}).map(function(ai){return INPUTS.find(function(p){return p.id===ai.input_id;});}).filter(Boolean):[];
+  var ov=showOrigin[rm.id];
+  var originHtml='';
+  if(ov&&act){
+    originHtml='<div class="origin-panel">'+
+      '<p class="lbl" style="margin-bottom:8px">Trazabilidad if/then</p>'+
+      (actInputs.length?'<div class="mb8">'+actInputs.map(function(inp){
+        var isPP=inp.type==='pain_point';
+        return'<div class="ifthen-row"><div class="ifthen-icon"><i class="ti ti-'+(isPP?'alert-circle':'bulb')+'" style="font-size:9px;color:var(--text2)"></i></div>'+
+          '<div><p style="font-size:12px;font-weight:500">'+inp.title+'</p><p class="muted">'+inp.area+'</p></div></div>';
+      }).join('')+'</div>':'')+
+      '<div class="ifthen-row mb4"><div class="ifthen-icon"><i class="ti ti-arrow-down" style="font-size:9px;color:var(--text3)"></i></div><span style="font-size:11px;color:var(--text3)">entonces...</span></div>'+
+      '<div class="ifthen-row mb6"><div class="ifthen-icon"><i class="ti ti-bolt" style="font-size:9px;color:var(--text2)"></i></div>'+
+        '<div><p style="font-size:12px;font-weight:600">'+act.title+'</p>'+(act.description?'<p class="muted">'+act.description+'</p>':'')+'</div></div>'+
+      (act.expectedValue?'<div class="ifthen-row"><div class="ifthen-icon"><i class="ti ti-trophy" style="font-size:9px;color:var(--ok-text)"></i></div>'+
+        '<div><p class="lbl" style="color:var(--ok-text);margin-bottom:2px">Valor esperado</p><p style="font-size:12px;color:var(--ok-text)">'+act.expectedValue+'</p></div></div>':'')+
+    '</div>';
+  }
+  return'<div class="rm-card">'+
+    '<div class="rm-card-body">'+
+      '<div class="flex gap6 mb8" style="align-items:flex-start">'+
+        '<p style="font-size:13px;font-weight:600;flex:1;line-height:1.4">'+rm.title+'</p>'+
+        '<div class="flex gap4">'+
+          '<button onclick="toggleOrigin(\''+rm.id+'\')" style="font-size:11px;'+(ov?'color:var(--text);border-color:var(--border2);background:var(--surface2)':'')+'"><i class="ti ti-sitemap"></i>Origen</button>'+
+          '<button onclick="delRM(\''+rm.id+'\')" class="ghost icon-btn"><i class="ti ti-x"></i></button>'+
+        '</div>'+
       '</div>'+
-      '<div class="h-col-body">'+
-      its.map(function(rm){
-        var dl=dlInfo(rm.deadline),log=rm.log||[],cur=logCursor[rm.id]||0;
-        var entry=log.length?log[log.length-1-cur]:null;
-        var act=ACTIONS.find(function(a){return a.id===rm.actionId;});
-        var actInputs=act?AINPUTS.filter(function(ai){return ai.action_id===act.id;}).map(function(ai){return INPUTS.find(function(p){return p.id===ai.input_id;});}).filter(Boolean):[];
-        var ov=showOrigin[rm.id];
-        var originHtml='';
-        if(ov&&act){
-          originHtml='<div class="origin-panel">'+
-            '<p class="lbl" style="margin-bottom:8px">Trazabilidad if/then</p>'+
-            (actInputs.length?'<div class="mb8">'+actInputs.map(function(inp){
-              var isPP=inp.type==='pain_point';
-              return'<div class="ifthen-row">'+
-                '<div class="ifthen-icon">'+
-                  '<i class="ti ti-'+(isPP?'alert-circle':'bulb')+'" style="font-size:9px;color:var(--text2)"></i>'+
-                '</div>'+
-                '<div><p style="font-size:12px;font-weight:500">'+inp.title+'</p><p class="muted">'+inp.area+'</p></div>'+
-              '</div>';
-            }).join('')+'</div>':'')+
-            '<div class="ifthen-row mb4"><div class="ifthen-icon"><i class="ti ti-arrow-down" style="font-size:9px;color:var(--text3)"></i></div><span style="font-size:11px;color:var(--text3)">entonces...</span></div>'+
-            '<div class="ifthen-row mb6"><div class="ifthen-icon"><i class="ti ti-bolt" style="font-size:9px;color:var(--text2)"></i></div>'+
-              '<div><p style="font-size:12px;font-weight:600">'+act.title+'</p>'+(act.description?'<p class="muted">'+act.description+'</p>':'')+'</div></div>'+
-            (act.expectedValue?'<div class="ifthen-row">'+
-              '<div class="ifthen-icon"><i class="ti ti-trophy" style="font-size:9px;color:var(--ok-text)"></i></div>'+
-              '<div><p class="lbl" style="color:var(--ok-text);margin-bottom:2px">Valor esperado</p>'+
-              '<p style="font-size:12px;color:var(--ok-text)">'+act.expectedValue+'</p></div></div>':'')+
-          '</div>';
-        }
-        return'<div class="rm-card">'+
-          '<div class="rm-card-body">'+
-            '<div class="flex gap6 mb8" style="align-items:flex-start">'+
-              '<p style="font-size:13px;font-weight:600;flex:1;line-height:1.4">'+rm.title+'</p>'+
-              '<div class="flex gap4">'+
-                '<button onclick="toggleOrigin(\''+rm.id+'\')" style="font-size:11px;'+(ov?'color:var(--text);border-color:var(--border2);background:var(--surface2)':'')+'" title="Ver trazabilidad">'+
-                  '<i class="ti ti-sitemap"></i>Origen</button>'+
-                '<button onclick="delRM(\''+rm.id+'\')" class="ghost icon-btn"><i class="ti ti-x"></i></button>'+
-              '</div>'+
-            '</div>'+
-            '<div class="flex-col gap8">'+
-              '<div class="g2">'+
-                '<div><span class="lbl">Owner</span><input type="text" value="'+(rm.owner||'')+'" onchange="updRM(\''+rm.id+'\',\'owner\',this.value)" placeholder="Responsable" style="font-size:12px" /></div>'+
-                '<div><span class="lbl">Estado</span><select onchange="updRM(\''+rm.id+'\',\'status\',this.value)" style="font-size:12px;color:'+(SCOL[rm.status]||'inherit')+'">'+
-                  STATS.map(function(s){return'<option value="'+s+'"'+(rm.status===s?' selected':'')+'>'+s+'</option>';}).join('')+
-                '</select></div>'+
-              '</div>'+
-              '<div class="g2">'+
-                '<div><span class="lbl">Horizonte</span><select onchange="updRM(\''+rm.id+'\',\'horizon\',this.value)" style="font-size:12px">'+
-                  HZNS.map(function(h2){return'<option value="'+h2.k+'"'+(rm.horizon===h2.k?' selected':'')+'>'+h2.l+'</option>';}).join('')+
-                '</select></div>'+
-                '<div><span class="lbl" style="color:'+dl.c+'">Deadline'+(dl.l?' - '+dl.l:'')+'</span>'+
-                '<input type="date" value="'+(rm.deadline||'')+'" onchange="updRM(\''+rm.id+'\',\'deadline\',this.value)" style="font-size:12px" /></div>'+
-              '</div>'+
-              '<div><span class="lbl">Notas estrategicas</span><textarea onchange="updRM(\''+rm.id+'\',\'notes\',this.value)" placeholder="Contexto o decisiones clave..." style="font-size:12px;min-height:44px">'+(rm.notes||'')+'</textarea></div>'+
-              '<div>'+
-                '<div class="flex gap6 mb6" style="align-items:center">'+
-                  '<span class="lbl" style="margin:0">Actualizaciones'+(log.length?' ('+log.length+')':'')+'</span>'+
-                  (log.length>1?'<div class="flex gap4" style="margin-left:auto;align-items:center">'+
-                    '<button class="log-nbtn" onclick="navLog(\''+rm.id+'\',1)"'+(cur>=log.length-1?' disabled':'')+'>'+
-                    '<i class="ti ti-chevron-left"></i></button>'+
-                    '<span class="muted" style="font-size:10px">'+(log.length-cur)+'/'+log.length+'</span>'+
-                    '<button class="log-nbtn" onclick="navLog(\''+rm.id+'\',-1)"'+(cur<=0?' disabled':'')+'>'+
-                    '<i class="ti ti-chevron-right"></i></button>'+
-                  '</div>':'')+
-                '</div>'+
-                '<div class="logbox mb6">'+(entry?'<p class="muted mb4">'+entry.author+' - '+fd(entry.ts)+'</p><p style="font-size:12px;line-height:1.5">'+entry.text+'</p>':'<span class="muted">Sin actualizaciones.</span>')+'</div>'+
-                '<div class="flex gap6">'+
-                  '<input type="text" id="log-inp-'+rm.id+'" placeholder="Nueva actualizacion..." style="font-size:12px" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addLog(\''+rm.id+'\')}" />'+
-                  '<button onclick="addLog(\''+rm.id+'\')" style="font-size:12px">+ Log</button>'+
-                '</div>'+
-              '</div>'+
-            '</div>'+
+      '<div class="flex-col gap8">'+
+        '<div class="g2">'+
+          '<div><span class="lbl">Owner</span><input type="text" value="'+(rm.owner||'')+'" onchange="updRM(\''+rm.id+'\',\'owner\',this.value)" placeholder="Responsable" style="font-size:12px" /></div>'+
+          '<div><span class="lbl">Estado</span><select onchange="updRM(\''+rm.id+'\',\'status\',this.value)" style="font-size:12px;color:'+(SCOL[rm.status]||'inherit')+'">'+
+            STATS.map(function(s){return'<option value="'+s+'"'+(rm.status===s?' selected':'')+'>'+s+'</option>';}).join('')+
+          '</select></div>'+
+        '</div>'+
+        '<div class="g2">'+
+          '<div><span class="lbl">Horizonte</span><select onchange="updRM(\''+rm.id+'\',\'horizon\',this.value)" style="font-size:12px">'+
+            HZNS.map(function(h2){return'<option value="'+h2.k+'"'+(rm.horizon===h2.k?' selected':'')+'>'+h2.l+'</option>';}).join('')+
+          '</select></div>'+
+          '<div><span class="lbl" style="color:'+dl.c+'">Deadline'+(dl.l?' - '+dl.l:'')+'</span>'+
+            '<input type="date" value="'+(rm.deadline||'')+'" onchange="updRM(\''+rm.id+'\',\'deadline\',this.value)" style="font-size:12px" /></div>'+
+        '</div>'+
+        '<div><span class="lbl">Notas estrategicas</span><textarea onchange="updRM(\''+rm.id+'\',\'notes\',this.value)" placeholder="Contexto o decisiones clave..." style="font-size:12px;min-height:44px">'+(rm.notes||'')+'</textarea></div>'+
+        '<div>'+
+          '<div class="flex gap6 mb6" style="align-items:center"><span class="lbl" style="margin:0">Actualizaciones'+(log.length?' ('+log.length+')':'')+'</span>'+
+            (log.length>1?'<div class="flex gap4" style="margin-left:auto;align-items:center">'+
+              '<button class="log-nbtn" onclick="navLog(\''+rm.id+'\',1)"'+(cur>=log.length-1?' disabled':'')+'><i class="ti ti-chevron-left"></i></button>'+
+              '<span class="muted" style="font-size:10px">'+(log.length-cur)+'/'+log.length+'</span>'+
+              '<button class="log-nbtn" onclick="navLog(\''+rm.id+'\',-1)"'+(cur<=0?' disabled':'')+'><i class="ti ti-chevron-right"></i></button></div>':'')+
           '</div>'+
-          originHtml+
-        '</div>';
-      }).join('')+
-      (its.length===0?'<div style="border:1px dashed var(--border);border-radius:var(--r);padding:1.25rem;text-align:center"><p class="muted">Sin acciones</p></div>':'')+
-      '</div></div></div>';
-  }).join('');
+          '<div class="logbox mb6">'+(entry?'<p class="muted mb4">'+entry.author+' - '+fd(entry.ts)+'</p><p style="font-size:12px;line-height:1.5">'+entry.text+'</p>':'<span class="muted">Sin actualizaciones.</span>')+'</div>'+
+          '<div class="flex gap6">'+
+            '<input type="text" id="log-inp-'+rm.id+'" placeholder="Nueva actualizacion..." style="font-size:12px" onkeydown="if(event.key===\'Enter\'){event.preventDefault();addLog(\''+rm.id+'\')}" />'+
+            '<button onclick="addLog(\''+rm.id+'\')" style="font-size:12px">+ Log</button>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+originHtml+'</div>';
+}
+
+function rCalendar(){
+  if(!admin)return;
+  var el=document.getElementById('rm-calendar');
+  var year=calYear,month=calMonth;
+  var firstDay=new Date(year,month,1).getDay();firstDay=(firstDay+6)%7;
+  var daysInMonth=new Date(year,month+1,0).getDate();
+  var prevMonthDays=new Date(year,month,0).getDate();
+  var byDay={};
+  var items=ownerFilter==='all'?ROADMAP:ROADMAP.filter(function(r){return r.owner===ownerFilter;});
+  items.forEach(function(r){
+    if(!r.deadline)return;
+    var p=r.deadline.split('-');
+    if(parseInt(p[0])===year&&parseInt(p[1])===month+1){
+      var d=parseInt(p[2]);if(!byDay[d])byDay[d]=[];byDay[d].push(r);
+    }
+  });
+  var today=new Date();var ty=today.getFullYear(),tm=today.getMonth(),td=today.getDate();
+  var cells=[];
+  for(var i=0;i<firstDay;i++)cells.push({day:prevMonthDays-firstDay+1+i,cur:false,its:[]});
+  for(var d=1;d<=daysInMonth;d++)cells.push({day:d,cur:true,its:byDay[d]||[],today:year===ty&&month===tm&&d===td});
+  var rem=(7-(cells.length%7))%7;for(var j=1;j<=rem;j++)cells.push({day:j,cur:false,its:[]});
+  var html='<div class="cal-wrap">'+
+    '<div class="cal-nav">'+
+      '<button class="ghost icon-btn" onclick="calPrev()"><i class="ti ti-chevron-left"></i></button>'+
+      '<span style="font-size:14px;font-weight:600;flex:1;text-align:center">'+MNAMES[month]+' '+year+'</span>'+
+      '<button class="ghost icon-btn" onclick="calNext()"><i class="ti ti-chevron-right"></i></button>'+
+    '</div>'+
+    '<div class="cal-grid-head">'+DNAMES.map(function(dn){return'<div class="cal-dname">'+dn+'</div>';}).join('')+'</div>'+
+    '<div class="cal-grid">'+
+    cells.map(function(c){
+      return'<div class="cal-cell" style="'+(c.cur?'':'opacity:.3')+'">'+
+        '<div class="cal-num'+(c.today?' today':'')+'">'+c.day+'</div>'+
+        c.its.map(function(r){
+          var hzn=HZNS.find(function(h){return h.k===r.horizon;});
+          var col=hzn?hzn.col:'#6b7280';
+          return'<div class="cal-ev" style="background:'+col+'25;border:1px solid '+col+'55;color:var(--text2)" onclick="showRMDetail(\''+r.id+'\')">'+
+            (r.owner?'<strong style="color:'+col+'">'+r.owner.split(' ')[0]+'</strong> ':'')+r.title+
+          '</div>';
+        }).join('')+
+      '</div>';
+    }).join('')+
+    '</div></div>';
+  el.innerHTML=html;
+}
+function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}rCalendar();}
+function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}rCalendar();}
+
+function showRMDetail(id){
+  var rm=ROADMAP.find(function(r){return r.id===id;});if(!rm)return;
+  var modal=document.getElementById('rm-modal');
+  document.getElementById('rm-modal-content').innerHTML='<div style="padding:1.25rem">'+
+    '<div class="flex gap8 mb12" style="align-items:center">'+
+      '<p style="font-size:15px;font-weight:600;flex:1">Detalle de iniciativa</p>'+
+      '<button onclick="closeRMModal()" class="ghost icon-btn"><i class="ti ti-x"></i></button>'+
+    '</div>'+rmCardHtml(rm)+'</div>';
+  modal.classList.remove('hidden');
+}
+function closeRMModal(e){
+  if(!e||e.target===document.getElementById('rm-modal'))document.getElementById('rm-modal').classList.add('hidden');
 }
 
 loadConfig();
