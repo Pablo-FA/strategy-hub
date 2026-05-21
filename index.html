@@ -978,6 +978,8 @@ var SCOL={'Sin iniciar':'#888','En analisis':'#378ADD','En progreso':'#EF9F27','
 
 var ownerFilter='all',rmTab='board';
 var calMonth=new Date().getMonth(),calYear=new Date().getFullYear();
+var visibleCols=JSON.parse(localStorage.getItem('sh_vis_cols')||'{"corto":true,"medio":true,"largo":true}');
+function toggleCol(k){visibleCols[k]=!visibleCols[k];localStorage.setItem('sh_vis_cols',JSON.stringify(visibleCols));rBoard();}
 var MNAMES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 var DNAMES=['Lun','Mar','Mie','Jue','Vie','Sab','Dom'];
 
@@ -997,8 +999,14 @@ function rOwnerBar(){
   var owners=[],seen={};
   ROADMAP.forEach(function(r){if(r.owner&&!seen[r.owner]){seen[r.owner]=1;owners.push(r.owner);}});
   var el=document.getElementById('rm-owner-bar');if(!el)return;
-  el.innerHTML='<button class="chip'+(ownerFilter==='all'?' on':'')+'" onclick="setOwnerFilter(\'all\')">Todos</button>'+
+  var ownerChips='<button class="chip'+(ownerFilter==='all'?' on':'')+'" onclick="setOwnerFilter(\'all\')">Todos</button>'+
     owners.map(function(o){return'<button class="chip'+(ownerFilter===o?' on':'')+'" onclick="setOwnerFilter(\''+o+'\')">'+o+'</button>';}).join('');
+  var colToggles='<span style="width:1px;background:var(--border);margin:0 4px;align-self:stretch;display:inline-block"></span>'+
+    HZNS.map(function(h){
+      var on=visibleCols[h.k]!==false;
+      return'<button class="chip'+(on?' on':'')+'" onclick="toggleCol(\''+h.k+'\')" style="'+(on?'border-color:'+h.col+'55;color:var(--text2)':'opacity:.5')+'">'+h.l+'</button>';
+    }).join('');
+  el.innerHTML=ownerChips+colToggles;
 }
 function rRM(){if(!admin)return;rOwnerBar();goRT(rmTab);}
 
@@ -1008,15 +1016,16 @@ function rBoard(){
   var backlog=items.filter(function(r){return!r.deadline||!r.owner;});
   var scheduled=items.filter(function(r){return r.deadline&&r.owner;});
   scheduled.sort(function(a,b){return new Date(a.deadline)-new Date(b.deadline);});
+  var activeCols=HZNS.filter(function(h){return visibleCols[h.k]!==false;});
   var cols=[];
   cols.push(renderCol('Backlog','Sin fecha / Sin asignar','#6b7280',backlog,true));
   cols.push('<div style="width:2px;background:var(--border2);border-radius:2px;margin:0 4px"></div>');
-  HZNS.forEach(function(h){
+  activeCols.forEach(function(h){
     cols.push(renderCol(h.l,h.s,h.col,scheduled.filter(function(r){return r.horizon===h.k;}),false));
   });
   var bd=document.getElementById('rm-board');
   bd.style.display='grid';
-  bd.style.gridTemplateColumns='1fr 10px repeat(3,1fr)';
+  bd.style.gridTemplateColumns='1fr 10px repeat('+activeCols.length+',1fr)';
   bd.style.gap='12px';
   bd.className='';
   bd.innerHTML=cols.join('');
