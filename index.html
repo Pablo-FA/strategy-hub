@@ -492,7 +492,7 @@ var api={
 
 var user='',admin=false,tab='home',stab='list',inputFilter='all',inputType='pain_point',formOpen=false;
 var INPUTS=[],BUCKETS=[],BINPUTS=[],ACTIONS=[],AINPUTS=[],ADEPS=[],ROADMAP=[],TAX={internal:[],external:[]};
-var openBuckets={},showOrigin={},logCursor={};
+var openBuckets={},showOrigin={},logCursor={},collapsedCards={};
 
 var ULOGS=[];
 
@@ -727,6 +727,7 @@ function delRM(id){
   api.del('roadmap_items','id=eq.'+id).catch(function(e){console.error(e);});
 }
 function toggleOrigin(id){showOrigin[id]=!showOrigin[id];rBoard();}
+function toggleCard(id){collapsedCards[id]=collapsedCards[id]===false?true:false;rBoard();}
 function toggleBucket(id){openBuckets[id]=openBuckets[id]===false?true:false;rAcciones();}
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
@@ -971,7 +972,7 @@ function rAcciones(){
   }else{upanel.classList.add('hidden');}
 }
 
-var HZNS=[{k:'corto',l:'Corto plazo',s:'0-6m',col:'#EF9F27'},{k:'medio',l:'Medio plazo',s:'6-18m',col:'#378ADD'},{k:'largo',l:'Largo plazo',s:'18-36m',col:'#7F77DD'}];
+var HZNS=[{k:'corto',l:'Corto plazo',s:'1-2m',col:'#EF9F27'},{k:'medio',l:'Medio plazo',s:'2-6m',col:'#378ADD'},{k:'largo',l:'Largo plazo',s:'6-12m',col:'#7F77DD'}];
 var STATS=['Sin iniciar','En analisis','En progreso','Bloqueado','Completado'];
 var SCOL={'Sin iniciar':'#888','En analisis':'#378ADD','En progreso':'#EF9F27','Bloqueado':'#E24B4A','Completado':'#639922'};
 
@@ -1036,9 +1037,29 @@ function renderCol(label,sub,col,its,isBacklog){
 }
 
 function rmCardHtml(rm){
-  var dl=dlInfo(rm.deadline),log=rm.log||[],cur=logCursor[rm.id]||0;
-  var entry=log.length?log[log.length-1-cur]:null;
+  var dl=dlInfo(rm.deadline);
+  var isExpanded=collapsedCards[rm.id]===false;
   var act=ACTIONS.find(function(a){return a.id===rm.actionId;});
+
+  if(!isExpanded){
+    return'<div class="rm-card" style="cursor:pointer" onclick="collapsedCards[\''+rm.id+'\']=false;rBoard()">'+
+      '<div class="rm-card-body" style="padding:.75rem 1rem">'+
+        '<div class="flex gap8" style="align-items:center">'+
+          '<div class="flex1" style="min-width:0">'+
+            '<p style="font-size:13px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+rm.title+'</p>'+
+          '</div>'+
+          '<div class="flex gap6" style="flex-shrink:0;align-items:center">'+
+            (rm.owner?'<span class="ntag" style="font-size:10px;padding:1px 7px">'+rm.owner+'</span>':'<span class="ntag" style="font-size:10px;padding:1px 7px;opacity:.5">Sin owner</span>')+
+            (rm.deadline?'<span style="font-size:11px;font-weight:500;color:'+dl.c+'">'+rm.deadline.split('-').reverse().join('/')+'</span>':'<span style="font-size:11px;color:var(--text3)">Sin fecha</span>')+
+            '<i class="ti ti-chevron-down" style="font-size:11px;color:var(--text3)"></i>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }
+
+  var log=rm.log||[],cur=logCursor[rm.id]||0;
+  var entry=log.length?log[log.length-1-cur]:null;
   var actInputs=act?AINPUTS.filter(function(ai){return ai.action_id===act.id;}).map(function(ai){return INPUTS.find(function(p){return p.id===ai.input_id;});}).filter(Boolean):[];
   var ov=showOrigin[rm.id];
   var originHtml='';
@@ -1064,6 +1085,7 @@ function rmCardHtml(rm){
         '<div class="flex gap4">'+
           '<button onclick="toggleOrigin(\''+rm.id+'\')" style="font-size:11px;'+(ov?'color:var(--text);border-color:var(--border2);background:var(--surface2)':'')+'"><i class="ti ti-sitemap"></i>Origen</button>'+
           '<button onclick="delRM(\''+rm.id+'\')" class="ghost icon-btn"><i class="ti ti-x"></i></button>'+
+          '<button onclick="event.stopPropagation();collapsedCards[\''+rm.id+'\']=true;rBoard()" class="ghost icon-btn"><i class="ti ti-chevron-up"></i></button>'+
         '</div>'+
       '</div>'+
       '<div class="flex-col gap8">'+
