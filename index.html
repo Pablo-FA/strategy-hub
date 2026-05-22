@@ -349,9 +349,22 @@ label{font-size:13px;color:var(--text2);display:inline-flex;align-items:center;g
 
     <!-- ACCIONES -->
     <div id="v-acciones" class="hidden">
-      <div class="flex gap10 mb16 wrap" style="align-items:flex-start">
+      <div class="flex gap10 mb12 wrap" style="align-items:flex-start">
         <div class="flex1"><p class="section-title">Acciones</p><p class="section-sub">Agrupa inputs en buckets y define acciones concretas con valor esperado.</p></div>
         <div id="acc-admin-controls" class="hidden"><button class="primary" onclick="showCreateBucket()"><i class="ti ti-plus"></i>Nuevo bucket</button></div>
+      </div>
+      <div id="acc-guide" class="mb12" style="background:var(--info-bg);border:1px solid var(--info-border);border-radius:var(--r-lg);padding:1rem">
+        <div class="flex gap8 mb8" style="align-items:center">
+          <i class="ti ti-info-circle" style="color:var(--info-text);font-size:15px"></i>
+          <p style="font-size:13px;font-weight:600;flex:1;color:var(--info-text)">Como crear acciones correctamente</p>
+          <button onclick="dismissGuide()" class="ghost icon-btn" style="color:var(--info-text)"><i class="ti ti-x"></i></button>
+        </div>
+        <div class="flex-col gap6">
+          <p style="font-size:12px;color:var(--info-text);line-height:1.6"><strong>1. Crea un bucket</strong> agrupando inputs relacionados que compartan un mismo problema de fondo.</p>
+          <p style="font-size:12px;color:var(--info-text);line-height:1.6"><strong>2. Ordena los inputs</strong> dentro del bucket de mas critico a menos, o de causa raiz a sintoma.</p>
+          <p style="font-size:12px;color:var(--info-text);line-height:1.6"><strong>3. Vincula inputs al crear la accion</strong> — sin inputs vinculados, la accion no tendra area ni trazabilidad en el Roadmap.</p>
+          <p style="font-size:12px;color:var(--info-text);line-height:1.6"><strong>4. Define el valor esperado</strong>: "Si ejecutamos esto, conseguiremos...". Esta es la logica if/then que conecta el problema con la solucion.</p>
+        </div>
       </div>
       <div id="bucket-form" class="card mb12 hidden" style="padding:1.25rem">
         <p class="bold mb8">Nuevo bucket</p>
@@ -558,6 +571,9 @@ document.getElementById('li-btn').onclick=login;
 document.getElementById('li-name').onkeydown=function(e){if(e.key==='Enter')login();};
 document.getElementById('cfg-key').onkeydown=function(e){if(e.key==='Enter')saveConfig();};
 
+function dismissGuide(){localStorage.setItem('sh_guide','1');var el=document.getElementById('acc-guide');if(el)el.style.display='none';}
+function showGuide(){var el=document.getElementById('acc-guide');if(!el)return;el.style.display=localStorage.getItem('sh_guide')==='1'?'none':'block';}
+
 function goTab(t){
   tab=t;
   ['home','inputs','acciones','roadmap'].forEach(function(x){
@@ -566,7 +582,7 @@ function goTab(t){
   });
   if(t==='home')rHome();
   if(t==='inputs')rInputs();
-  if(t==='acciones')rAcciones();
+  if(t==='acciones'){rAcciones();showGuide();}
   if(t==='roadmap')rRM();
 }
 
@@ -1005,7 +1021,7 @@ var HZNS=[{k:'corto',l:'Corto plazo',s:'1-2m',col:'#EF9F27'},{k:'medio',l:'Medio
 var STATS=['Sin iniciar','En analisis','En progreso','Bloqueado','Completado'];
 var SCOL={'Sin iniciar':'#888','En analisis':'#378ADD','En progreso':'#EF9F27','Bloqueado':'#E24B4A','Completado':'#639922'};
 
-var ownerFilter='all',rmTab='board';
+var ownerFilter='all',areaFilter='all',rmTab='board';
 var calMonth=new Date().getMonth(),calYear=new Date().getFullYear();
 var visibleCols=JSON.parse(localStorage.getItem('sh_vis_cols')||'{"corto":true,"medio":true,"largo":true}');
 function toggleCol(k){visibleCols[k]=!visibleCols[k];localStorage.setItem('sh_vis_cols',JSON.stringify(visibleCols));rBoard();}
@@ -1020,28 +1036,63 @@ function goRT(t){
   document.getElementById('rtb-cal').classList.toggle('on',t==='cal');
   if(t==='board')rBoard();else rCalendar();
 }
-function setOwnerFilter(o){
-  ownerFilter=o;rOwnerBar();
-  if(rmTab==='board')rBoard();else rCalendar();
+function setOwnerFilter(o){ownerFilter=o;rOwnerBar();if(rmTab==='board')rBoard();else rCalendar();}
+function setAreaFilter(a){areaFilter=a;rOwnerBar();if(rmTab==='board')rBoard();else rCalendar();}
+function getRoadmapAreas(){
+  var areas=[],seen={};
+  ROADMAP.forEach(function(rm){
+    var act=ACTIONS.find(function(a){return a.id===rm.actionId;});if(!act)return;
+    AINPUTS.filter(function(ai){return ai.action_id===act.id;})
+      .map(function(ai){return INPUTS.find(function(p){return p.id===ai.input_id;});})
+      .filter(Boolean).forEach(function(inp){if(inp.area&&!seen[inp.area]){seen[inp.area]=1;areas.push(inp.area);}});
+  });
+  return areas.sort();
 }
 function rOwnerBar(){
   var owners=[],seen={};
   ROADMAP.forEach(function(r){if(r.owner&&!seen[r.owner]){seen[r.owner]=1;owners.push(r.owner);}});
+  var areas=getRoadmapAreas();
   var el=document.getElementById('rm-owner-bar');if(!el)return;
-  var ownerChips='<button class="chip'+(ownerFilter==='all'?' on':'')+'" onclick="setOwnerFilter(\'all\')">Todos</button>'+
-    owners.map(function(o){return'<button class="chip'+(ownerFilter===o?' on':'')+'" onclick="setOwnerFilter(\''+o+'\')">'+o+'</button>';}).join('');
-  var colToggles='<span style="width:1px;background:var(--border);margin:0 4px;align-self:stretch;display:inline-block"></span>'+
-    HZNS.map(function(h){
-      var on=visibleCols[h.k]!==false;
-      return'<button class="chip'+(on?' on':'')+'" onclick="toggleCol(\''+h.k+'\')" style="'+(on?'border-color:'+h.col+'55;color:var(--text2)':'opacity:.5')+'">'+h.l+'</button>';
-    }).join('');
-  el.innerHTML=ownerChips+colToggles;
+  var selStyle='font-size:12px;width:auto;padding:5px 8px;border-radius:var(--r-sm);background:var(--surface2);border:1px solid var(--border);color:var(--text2);cursor:pointer';
+  var dropdowns=
+    '<div class="flex gap8 flex1 wrap" style="align-items:center">'+
+      '<div class="flex gap6" style="align-items:center">'+
+        '<span style="font-size:11px;color:var(--text3)">Owner</span>'+
+        '<select style="'+selStyle+'" onchange="setOwnerFilter(this.value)">'+
+          '<option value="all"'+(ownerFilter==='all'?' selected':'')+'>Todos</option>'+
+          owners.map(function(o){return'<option value="'+o+'"'+(ownerFilter===o?' selected':'')+'>'+o+'</option>';}).join('')+
+        '</select>'+
+      '</div>'+
+      '<div class="flex gap6" style="align-items:center">'+
+        '<span style="font-size:11px;color:var(--text3)">Area</span>'+
+        '<select style="'+selStyle+'" onchange="setAreaFilter(this.value)">'+
+          '<option value="all"'+(areaFilter==='all'?' selected':'')+'>Todas</option>'+
+          areas.map(function(a){return'<option value="'+a+'"'+(areaFilter===a?' selected':'')+'>'+a+'</option>';}).join('')+
+        '</select>'+
+      '</div>'+
+    '</div>'+
+    '<div class="flex gap4" style="align-items:center;flex-shrink:0">'+
+      '<span style="font-size:11px;color:var(--text3);margin-right:2px">Vista</span>'+
+      HZNS.map(function(h){
+        var on=visibleCols[h.k]!==false;
+        return'<button class="chip'+(on?' on':'')+'" onclick="toggleCol(\''+h.k+'\')" style="font-size:10px;padding:2px 8px;'+(on?'border-color:'+h.col+'55':'opacity:.45')+'">'+h.l+'</button>';
+      }).join('')+
+    '</div>';
+  el.innerHTML=dropdowns;
 }
 function rRM(){if(!admin)return;rOwnerBar();goRT(rmTab);}
 
 function rBoard(){
   if(!admin)return;
   var items=ownerFilter==='all'?ROADMAP:ROADMAP.filter(function(r){return r.owner===ownerFilter;});
+  if(areaFilter!=='all'){
+    items=items.filter(function(rm){
+      var act=ACTIONS.find(function(a){return a.id===rm.actionId;});if(!act)return false;
+      return AINPUTS.filter(function(ai){return ai.action_id===act.id;})
+        .map(function(ai){return INPUTS.find(function(p){return p.id===ai.input_id;});})
+        .filter(Boolean).some(function(inp){return inp.area===areaFilter;});
+    });
+  }
   var backlog=items.filter(function(r){return!r.deadline||!r.owner;});
   var scheduled=items.filter(function(r){return r.deadline&&r.owner;});
   scheduled.sort(function(a,b){return new Date(a.deadline)-new Date(b.deadline);});
