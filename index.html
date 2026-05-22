@@ -708,9 +708,24 @@ function toRoadmap(actionId){
   api.post('roadmap_items',{id:rm.id,action_id:rm.actionId,title:rm.title,horizon:rm.horizon,owner:rm.owner,status:rm.status,deadline:rm.deadline,notes:rm.notes,log:rm.log}).catch(function(e){console.error(e);});
 }
 var saveTimers={};
+var expandedNotes={};
+function toggleNotes(id){expandedNotes[id]=!expandedNotes[id];rBoard();}
+function calcHorizon(deadline){
+  if(!deadline)return null;
+  var now=new Date(),dl=new Date(deadline);
+  var months=(dl.getFullYear()-now.getFullYear())*12+(dl.getMonth()-now.getMonth());
+  if(months<=2)return'corto';
+  if(months<=6)return'medio';
+  return'largo';
+}
 function updRM(id,field,val){
   var it=ROADMAP.find(function(r){return r.id===id;});if(!it)return;
   it[field]=val;
+  if(field==='deadline'){
+    var h=calcHorizon(val);
+    if(h){it.horizon=h;api.patch('roadmap_items',id,{horizon:h}).catch(function(e){console.error(e);});}
+    rBoard();return;
+  }
   if(field==='horizon')rBoard();
   var textFields=['owner','notes'];
   if(textFields.indexOf(field)>=0){
@@ -1117,14 +1132,18 @@ function rmCardHtml(rm){
             STATS.map(function(s){return'<option value="'+s+'"'+(rm.status===s?' selected':'')+'>'+s+'</option>';}).join('')+
           '</select></div>'+
         '</div>'+
-        '<div class="g2">'+
-          '<div><span class="lbl">Horizonte</span><select onchange="updRM(\''+rm.id+'\',\'horizon\',this.value)" style="font-size:12px">'+
-            HZNS.map(function(h2){return'<option value="'+h2.k+'"'+(rm.horizon===h2.k?' selected':'')+'>'+h2.l+'</option>';}).join('')+
-          '</select></div>'+
-          '<div><span class="lbl" style="color:'+dl.c+'">Deadline'+(dl.l?' - '+dl.l:'')+'</span>'+
-            '<input type="date" value="'+(rm.deadline||'')+'" onchange="updRM(\''+rm.id+'\',\'deadline\',this.value)" style="font-size:12px" /></div>'+
+        '<div><span class="lbl" style="color:'+dl.c+'">Deadline'+(dl.l?' - '+dl.l:'')+'</span>'+
+          '<input type="date" value="'+(rm.deadline||'')+'" onchange="updRM(\''+rm.id+'\',\'deadline\',this.value)" style="font-size:12px" /></div>'+
+        '<div>'+
+          '<div class="flex gap6" style="align-items:center;margin-bottom:4px">'+
+            '<span class="lbl" style="margin:0">Notas estrategicas</span>'+
+            '<button onclick="event.stopPropagation();toggleNotes(\''+rm.id+'\')" class="ghost" style="font-size:10px;padding:1px 4px;height:auto;border-color:transparent">'+
+              (expandedNotes[rm.id]?'<i class="ti ti-chevron-up"></i> ocultar':'<i class="ti ti-chevron-down"></i> ver')+
+            '</button>'+
+            (!expandedNotes[rm.id]&&rm.notes?'<span style="font-size:11px;color:var(--text3);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1;min-width:0">'+rm.notes+'</span>':'')+
+          '</div>'+
+          (expandedNotes[rm.id]?'<textarea oninput="updRM(\''+rm.id+'\',\'notes\',this.value)" placeholder="Contexto o decisiones clave..." style="font-size:12px;min-height:44px">'+(rm.notes||'')+'</textarea>':'')+
         '</div>'+
-        '<div><span class="lbl">Notas estrategicas</span><textarea oninput="updRM(\''+rm.id+'\',\'notes\',this.value)" placeholder="Contexto o decisiones clave..." style="font-size:12px;min-height:44px">'+(rm.notes||'')+'</textarea></div>'+
         '<div>'+
           '<div class="flex gap6 mb6" style="align-items:center"><span class="lbl" style="margin:0">Actualizaciones'+(log.length?' ('+log.length+')':'')+'</span>'+
             (log.length>1?'<div class="flex gap4" style="margin-left:auto;align-items:center">'+
