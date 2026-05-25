@@ -732,6 +732,7 @@ var saveTimers={};
 var expandedNotes={},expandedLogs={};
 function toggleNotes(id){expandedNotes[id]=!expandedNotes[id];rBoard();}
 function toggleLogs(id){expandedLogs[id]=!expandedLogs[id];rBoard();}
+function toggleDone(lbl){expandedDone[lbl]=!expandedDone[lbl];rBoard();}
 function calcHorizon(deadline){
   if(!deadline)return null;
   var now=new Date(),dl=new Date(deadline);
@@ -1034,6 +1035,7 @@ function rAcciones(){
 var HZNS=[{k:'corto',l:'Corto plazo',s:'1-2m',col:'#EF9F27'},{k:'medio',l:'Medio plazo',s:'2-6m',col:'#378ADD'},{k:'largo',l:'Largo plazo',s:'6-12m',col:'#7F77DD'}];
 var STATS=['Sin iniciar','En analisis','En progreso','Bloqueado','Completado'];
 var SCOL={'Sin iniciar':'#888','En analisis':'#378ADD','En progreso':'#EF9F27','Bloqueado':'#E24B4A','Completado':'#639922'};
+var expandedDone={};
 
 var ownerFilter='all',areaFilter='all',rmTab='board';
 var calMonth=new Date().getMonth(),calYear=new Date().getFullYear();
@@ -1126,16 +1128,31 @@ function rBoard(){
 }
 
 function renderCol(label,sub,col,its,isBacklog){
-  return'<div><div class="h-col-wrap" style="'+(isBacklog?'border-style:dashed;border-color:var(--border2)':'')+'">'+
-    '<div class="h-col-head" style="border-top:3px solid '+col+'">'+
-      '<span class="h-dot" style="background:'+col+'"></span>'+
-      '<span style="font-size:13px;font-weight:600">'+label+'</span>'+
-      '<span class="muted" style="margin-left:auto;font-size:11px">'+sub+'</span>'+
-      '<span class="ntag" style="margin-left:8px;font-size:11px">'+its.length+'</span>'+
+  var active=its.filter(function(r){return r.status!=='Completado';});
+  var done=its.filter(function(r){return r.status==='Completado';});
+  var doneOpen=expandedDone[label]||false;
+  var arrow=doneOpen?'&#9660;':'&#9654;';
+  return'<div><div class=\"h-col-wrap\" style=\"'+(isBacklog?'border-style:dashed;border-color:var(--border2)':'')+'\">'+ 
+    '<div class=\"h-col-head\" style=\"border-top:3px solid '+col+'\">'+
+      '<span class=\"h-dot\" style=\"background:'+col+'\"></span>'+
+      '<span style=\"font-size:13px;font-weight:600\">'+label+'</span>'+
+      '<span class=\"muted\" style=\"margin-left:auto;font-size:11px\">'+sub+'</span>'+
+      '<span class=\"ntag\" style=\"margin-left:8px;font-size:11px\">'+active.length+'</span>'+
     '</div>'+
-    '<div class="h-col-body">'+
-    its.map(function(rm){return rmCardHtml(rm);}).join('')+
-    (its.length===0?'<div style="border:1px dashed var(--border);border-radius:var(--r);padding:1.25rem;text-align:center"><p class="muted">'+(isBacklog?'Sin items en backlog':'Sin acciones')+'</p></div>':'')+
+    '<div class=\"h-col-body\">'+
+    active.map(function(rm){return rmCardHtml(rm);}).join('')+
+    (active.length===0?'<div style=\"border:1px dashed var(--border);border-radius:var(--r);padding:1.25rem;text-align:center\"><p class=\"muted\">'+(isBacklog?'Sin items en backlog':'Sin acciones')+'</p></div>':'')+
+    (done.length>0?
+      '<div style=\"margin-top:10px;border-top:1px dashed var(--border);padding-top:6px\">'+
+        '<button data-lbl=\"'+label+'\" onclick=\"toggleDone(this.getAttribute(\'data-lbl\'))\" class=\"ghost\" style=\"width:100%;display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:var(--r);font-size:12px;color:var(--text3);cursor:pointer\">'+
+          '<span style=\"font-size:9px\">'+arrow+'</span>'+
+          '<span style=\"color:#639922;font-size:11px\">&#10003;</span>'+
+          '<span>Completadas</span>'+
+          '<span class=\"ntag\" style=\"margin-left:auto;font-size:11px;background:rgba(99,153,34,.15);color:#639922;border-color:rgba(99,153,34,.3)\">'+done.length+'</span>'+
+        '</button>'+
+        (doneOpen?'<div style=\"opacity:.65;margin-top:4px\">'+done.map(function(rm){return rmCardHtml(rm);}).join('')+'</div>':'')+
+      '</div>'
+    :'')+
     '</div></div></div>';
 }
 
