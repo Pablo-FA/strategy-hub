@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S&D · SharePoint Test</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#0d0d0f;--surface:#141416;--border:#222226;--text1:#f0f0f0;--text2:#888;--text3:#444;--green:#22c55e;--red:#ef4444;--amber:#f59e0b}
+  body{background:var(--bg);color:var(--text1);font-family:'SF Mono','Cascadia Code','Consolas',monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .container{width:100%;max-width:680px}
+  .header{margin-bottom:32px}
+  .header h1{font-size:13px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--text2);margin-bottom:6px}
+  .header p{font-size:11px;color:var(--text3);letter-spacing:.05em}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px 24px;margin-bottom:12px}
+  .card-title{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:16px}
+  .status-row{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text2);padding:8px 0;border-bottom:1px solid var(--border)}
+  .status-row:last-child{border-bottom:none}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background .3s}
+  .dot.ok{background:var(--green)}.dot.err{background:var(--red)}.dot.loading{background:var(--amber);animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .status-label{flex:1}.status-value{font-size:11px;color:var(--text3);max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+  .status-value.ok{color:var(--green)}.status-value.err{color:var(--red)}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text1);font-family:inherit;font-size:12px;letter-spacing:.08em;cursor:pointer;transition:all .15s}
+  .btn:hover{border-color:#555;background:#1a1a1e}.btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn.primary{border-color:#fff;color:#fff}.btn.primary:hover{background:rgba(255,255,255,.06)}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .data-preview{margin-top:12px;background:#0a0a0c;border:1px solid var(--border);border-radius:6px;padding:14px 16px;font-size:11px;color:var(--text2);line-height:1.8;max-height:200px;overflow-y:auto;display:none}
+  .data-preview.visible{display:block}
+  .data-item{display:flex;gap:12px;padding:5px 0;border-bottom:1px solid #1a1a1e}
+  .data-item:last-child{border-bottom:none}
+  .data-key{color:var(--text3);min-width:120px}.data-val{color:var(--text1)}
+  .log{font-size:10px;color:var(--text3);line-height:2;margin-top:8px}
+  .log .l-ok{color:var(--green)}.log .l-err{color:var(--red)}.log .l-info{color:var(--amber)}
+  .error-box{margin-top:12px;padding:12px 16px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:6px;font-size:11px;color:#fca5a5;line-height:1.7;display:none}
+  .error-box.visible{display:block}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>S&amp;D · SharePoint Connection Test</h1>
+    <p>Verificación de acceso a Microsoft Lists via Graph API · OAuth2 PKCE</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Autenticación</div>
+    <div class="status-row">
+      <div class="dot" id="dot-auth"></div>
+      <span class="status-label">Estado de sesión</span>
+      <span class="status-value" id="val-auth">Sin iniciar</span>
+    </div>
+    <div class="status-row">
+      <div class="dot" id="dot-user"></div>
+      <span class="status-label">Usuario</span>
+      <span class="status-value" id="val-user">—</span>
+    </div>
+    <div class="status-row">
+      <div class="dot" id="dot-token"></div>
+      <span class="status-label">Token Graph API</span>
+      <span class="status-value" id="val-token">—</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" id="btn-login" onclick="doLogin()">→ Login con cuenta Accenture</button>
+      <button class="btn" id="btn-logout" onclick="doLogout()" style="display:none">Cerrar sesión</button>
+    </div>
+    <div class="error-box" id="auth-error"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Listas SharePoint</div>
+    <div class="status-row">
+      <div class="dot" id="dot-profiles"></div>
+      <span class="status-label">SD_Profiles</span>
+      <span class="status-value" id="val-profiles">—</span>
+    </div>
+    <div class="status-row">
+      <div class="dot" id="dot-assignments"></div>
+      <span class="status-label">SD_Assignments</span>
+      <span class="status-value" id="val-assignments">—</span>
+    </div>
+    <div class="status-row">
+      <div class="dot" id="dot-demands"></div>
+      <span class="status-label">SD_Demands</span>
+      <span class="status-value" id="val-demands">—</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="btn-test" onclick="testLists()" disabled>Probar acceso a listas</button>
+    </div>
+    <div class="log" id="test-log"></div>
+    <div class="error-box" id="lists-error"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Preview de datos — SD_Profiles</div>
+    <div class="btn-row" style="margin-top:0">
+      <button class="btn" id="btn-fetch" onclick="fetchProfiles()" disabled>Leer SD_Profiles</button>
+    </div>
+    <div class="data-preview" id="data-preview"></div>
+    <div class="log" id="fetch-log"></div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ───────────────────────────────────────────────────────────────────
+const TENANT_ID  = "e0793d39-0939-496d-b129-198edd916feb";
+const CLIENT_ID  = "04b07795-8542-4562-827d-2611572ce61e"; // Microsoft Azure CLI (public client)
+const REDIRECT   = window.location.origin + window.location.pathname;
+const SCOPES     = "https://graph.microsoft.com/Sites.ReadWrite.All https://graph.microsoft.com/User.Read openid profile";
+const SITE_HOST  = "myoffice.accenture.com";
+const SITE_PATH  = "/personal/pablo_fajardo_accenture_com";
+
+const LIST_IDS = {
+  profiles:    "dca7c244-5057-4adf-846d-eb1b5b4bcdaa",
+  assignments: "87b090f2-221f-4cad-ac94-546152e7fda1",
+  demands:     "f2f5a4e2-60bc-41bc-869b-dc5de064c477",
+};
+
+// ── PKCE HELPERS ─────────────────────────────────────────────────────────────
+function randomBase64(len) {
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return btoa(String.fromCharCode(...arr)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+
+async function sha256Base64(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+
+// ── UI HELPERS ───────────────────────────────────────────────────────────────
+const $  = id => document.getElementById(id);
+function setDot(id, s) { $('dot-'+id).className = 'dot '+s; }
+function setVal(id, t, c='') { const v=$('val-'+id); v.textContent=t; v.className='status-value '+c; }
+function log(cid, msg, type='info') { $(cid).innerHTML += `<span class="l-${type}">${msg}</span><br>`; }
+function showErr(id, msg) { const e=$(id); e.textContent=msg; e.classList.add('visible'); }
+
+// ── AUTH ─────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  $('auth-error').classList.remove('visible');
+  setDot('auth','loading'); setVal('auth','Redirigiendo a Microsoft...');
+
+  const verifier  = randomBase64(32);
+  const challenge = await sha256Base64(verifier);
+  const state     = randomBase64(16);
+
+  sessionStorage.setItem('pkce_verifier', verifier);
+  sessionStorage.setItem('pkce_state', state);
+
+  const params = new URLSearchParams({
+    client_id:             CLIENT_ID,
+    response_type:         'code',
+    redirect_uri:          REDIRECT,
+    scope:                 SCOPES,
+    state:                 state,
+    code_challenge:        challenge,
+    code_challenge_method: 'S256',
+    prompt:                'select_account',
+  });
+
+  window.location.href = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/authorize?${params}`;
+}
+
+async function handleCallback() {
+  const params   = new URLSearchParams(window.location.search);
+  const code     = params.get('code');
+  const retState = params.get('state');
+  const error    = params.get('error');
+
+  if (error) {
+    setDot('auth','err'); setVal('auth','Error','err');
+    showErr('auth-error', `${error}: ${params.get('error_description') || ''}`);
+    return;
+  }
+
+  if (!code) return;
+
+  // Clean URL
+  window.history.replaceState({}, '', window.location.pathname);
+
+  const verifier = sessionStorage.getItem('pkce_verifier');
+  if (!verifier) { showErr('auth-error','Sesión PKCE perdida. Intenta de nuevo.'); return; }
+
+  setDot('auth','loading'); setVal('auth','Obteniendo token...');
+
+  try {
+    const body = new URLSearchParams({
+      client_id:     CLIENT_ID,
+      grant_type:    'authorization_code',
+      code:          code,
+      redirect_uri:  REDIRECT,
+      code_verifier: verifier,
+      scope:         SCOPES,
+    });
+
+    const res  = await fetch(`https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    });
+    const data = await res.json();
+
+    if (data.error) throw new Error(`${data.error}: ${data.error_description}`);
+
+    sessionStorage.setItem('access_token', data.access_token);
+    sessionStorage.setItem('user_name', data.id_token ? parseJwt(data.id_token).preferred_username || '—' : '—');
+
+    onLoginSuccess(sessionStorage.getItem('user_name'), data.access_token);
+  } catch(e) {
+    setDot('auth','err'); setVal('auth','Error','err');
+    showErr('auth-error', e.message);
+  }
+}
+
+function parseJwt(token) {
+  try { return JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); }
+  catch(e) { return {}; }
+}
+
+function onLoginSuccess(user, token) {
+  setDot('auth','ok'); setVal('auth','Autenticado','ok');
+  setDot('user','ok'); setVal('user', user, 'ok');
+  setDot('token','ok'); setVal('token','Obtenido ✓','ok');
+  $('btn-login').style.display = 'none';
+  $('btn-logout').style.display = 'inline-flex';
+  $('btn-test').disabled = false;
+  $('btn-fetch').disabled = false;
+}
+
+function doLogout() {
+  sessionStorage.clear();
+  window.location.href = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/logout?post_logout_redirect_uri=${encodeURIComponent(REDIRECT)}`;
+}
+
+function getToken() { return sessionStorage.getItem('access_token'); }
+
+// ── TEST LISTS ───────────────────────────────────────────────────────────────
+let siteId = null;
+
+async function getSiteId() {
+  if (siteId) return siteId;
+  const res  = await fetch(`https://graph.microsoft.com/v1.0/sites/${SITE_HOST}:${SITE_PATH}`,
+    { headers: { Authorization: `Bearer ${getToken()}` } });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  siteId = data.id;
+  return siteId;
+}
+
+async function testLists() {
+  $('test-log').innerHTML = '';
+  $('lists-error').classList.remove('visible');
+  log('test-log','→ Obteniendo Site ID...','info');
+
+  let sid;
+  try {
+    sid = await getSiteId();
+    log('test-log','✓ Site ID obtenido','ok');
+  } catch(e) {
+    log('test-log','✗ Error: '+e.message,'err');
+    showErr('lists-error', e.message);
+    return;
+  }
+
+  for (const [key, listId] of Object.entries(LIST_IDS)) {
+    setDot(key,'loading');
+    try {
+      const res  = await fetch(`https://graph.microsoft.com/v1.0/sites/${sid}/lists/${listId}`,
+        { headers: { Authorization: `Bearer ${getToken()}` } });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+      setDot(key,'ok'); setVal(key, data.name+' ✓','ok');
+      log('test-log','✓ '+key+': OK','ok');
+    } catch(e) {
+      setDot(key,'err'); setVal(key,'Error','err');
+      log('test-log','✗ '+key+': '+e.message,'err');
+    }
+  }
+}
+
+// ── FETCH PROFILES ───────────────────────────────────────────────────────────
+async function fetchProfiles() {
+  $('fetch-log').innerHTML = '';
+  const preview = $('data-preview');
+  preview.innerHTML = 'Cargando...'; preview.classList.add('visible');
+
+  try {
+    const sid  = await getSiteId();
+    const res  = await fetch(
+      `https://graph.microsoft.com/v1.0/sites/${sid}/lists/${LIST_IDS.profiles}/items?expand=fields&$top=20`,
+      { headers: { Authorization: `Bearer ${getToken()}` } });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const items = data.value || [];
+
+    if (!items.length) {
+      preview.innerHTML = '<span style="color:var(--text3)">Lista vacía — agrega registros de prueba en SharePoint.</span>';
+      log('fetch-log','ℹ️ Lista accesible pero vacía','info');
+      return;
+    }
+
+    preview.innerHTML = items.map(i => {
+      const f = i.fields;
+      return `<div class="data-item"><span class="data-key">${f.Title||'—'}</span><span class="data-val">${f.Role||''} · ${f.Seniority||''} · ${f.Capability||''}</span></div>`;
+    }).join('');
+    log('fetch-log','✓ '+items.length+' perfil(es) leídos','ok');
+  } catch(e) {
+    preview.innerHTML = `<span style="color:var(--red)">${e.message}</span>`;
+    log('fetch-log','✗ '+e.message,'err');
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  // Check if returning from OAuth redirect
+  if (window.location.search.includes('code=') || window.location.search.includes('error=')) {
+    handleCallback();
+    return;
+  }
+  // Check existing session
+  const token = getToken();
+  if (token) {
+    const user = sessionStorage.getItem('user_name') || '—';
+    onLoginSuccess(user, token);
+  }
+});
+</script>
+</body>
+</html>
